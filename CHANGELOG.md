@@ -29,14 +29,18 @@ All notable changes to this project are documented here. The format follows
 
 - `dev/` preview of the cards with made-up demo alerts, and `scripts/banners.py` for the README artwork and the icon.
 
-## [0.1.1] - 2026-10-10
+## 0.1.1 - 2026-10-10
+
+Release withdrawn: it shipped an icon based on the KidsAlert logo. Its changes are in 0.1.2.
 
 ### Changed
 
 - Alert details dialog: a small image next to the title and date, with the text below. Tapping the image opens it full size, and videos open from a ▶ Video button instead of taking up the top of the dialog.
 - The dialog takes keyboard focus itself instead of the close button.
 
-## [0.1.0] - 2026-10-09
+## 0.1.0 - 2026-10-09
+
+Release withdrawn: it shipped an icon based on the KidsAlert logo. Its changes are in 0.1.2.
 
 ### Added
 
@@ -49,6 +53,4 @@ All notable changes to this project are documented here. The format follows
 
 [Unreleased]: https://github.com/MichalZaniewicz/ha-kidsalert/compare/v0.1.3...HEAD
 [0.1.3]: https://github.com/MichalZaniewicz/ha-kidsalert/compare/v0.1.2...v0.1.3
-[0.1.2]: https://github.com/MichalZaniewicz/ha-kidsalert/compare/v0.1.1...v0.1.2
-[0.1.1]: https://github.com/MichalZaniewicz/ha-kidsalert/compare/v0.1.0...v0.1.1
-[0.1.0]: https://github.com/MichalZaniewicz/ha-kidsalert/releases/tag/v0.1.0
+[0.1.2]: https://github.com/MichalZaniewicz/ha-kidsalert/releases/tag/v0.1.2
