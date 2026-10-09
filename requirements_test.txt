@@ -1,0 +1,4 @@
+# Pins Home Assistant 2026.10.0 and its test tooling.
+pytest-homeassistant-custom-component==0.13.371
+home-assistant-frontend==20260930.2
+ruff==0.17.0

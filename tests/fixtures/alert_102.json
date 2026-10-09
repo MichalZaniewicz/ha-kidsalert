@@ -1,0 +1,18 @@
+{
+  "id": 102,
+  "title": "To nie jest challenge – ale jest gra",
+  "content": "<p><strong>Stanowisko KidsAlert jest jednoznaczne:</strong> CHALLENGE NIE MA!</p>\r\n<ul><li>Rozmawiaj z dzieckiem</li><li>Sprawdź telefon</li></ul><script>alert(1)</script><p>Więcej: https://kidsalert.pl/</p>",
+  "created": "2026-10-08T15:00:49.728357+02:00",
+  "modified": "2026-10-08T15:34:00.471127+02:00",
+  "title_en": "It is not a challenge – but there is a game",
+  "content_en": "<p>English content</p>",
+  "image": "https://kidsalert.pl/media/alerts/game.jpeg",
+  "video": "https://kidsalert.pl/media/alerts/videos/game.mp4",
+  "is_sensitive": false,
+  "is_danger": true,
+  "is_active": true,
+  "social_media": 2,
+  "version": 2,
+  "send_at": "2026-10-08T15:00:31+02:00",
+  "was_sent_at": "2026-10-08T15:00:51.947675+02:00"
+}

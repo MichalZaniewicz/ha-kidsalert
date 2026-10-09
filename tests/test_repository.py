@@ -1,0 +1,48 @@
+"""Repository consistency: versions and translations must not drift apart."""
+
+from __future__ import annotations
+
+import json
+from pathlib import Path
+import re
+import tomllib
+
+from custom_components.kidsalert.const import VERSION
+
+ROOT = Path(__file__).parents[1]
+COMPONENT = ROOT / "custom_components" / "kidsalert"
+
+
+def _keys(data: object, prefix: str = "") -> set[str]:
+    if not isinstance(data, dict):
+        return {prefix}
+    return {key for name, value in data.items() for key in _keys(value, f"{prefix}.{name}")}
+
+
+def test_versions_match() -> None:
+    manifest = json.loads((COMPONENT / "manifest.json").read_text(encoding="utf-8"))
+    card = (COMPONENT / "frontend" / "kidsalert-card.js").read_text(encoding="utf-8")
+    pyproject = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+
+    card_version = re.search(r'const VERSION = "([^"]+)"', card).group(1)
+    assert manifest["version"] == VERSION
+    assert card_version == VERSION
+    assert pyproject["project"]["version"] == VERSION
+
+
+def test_translations_cover_strings() -> None:
+    strings = json.loads((COMPONENT / "strings.json").read_text(encoding="utf-8"))
+    for path in (COMPONENT / "translations").glob("*.json"):
+        translation = json.loads(path.read_text(encoding="utf-8"))
+        assert _keys(translation) == _keys(strings), path.name
+
+
+def test_english_translation_is_strings_copy() -> None:
+    strings = (COMPONENT / "strings.json").read_text(encoding="utf-8")
+    english = (COMPONENT / "translations" / "en.json").read_text(encoding="utf-8")
+    assert json.loads(english) == json.loads(strings)
+
+
+def test_brand_images_present() -> None:
+    for name in ("icon.png", "icon@2x.png", "dark_icon.png", "dark_icon@2x.png"):
+        assert (COMPONENT / "brand" / name).is_file(), name

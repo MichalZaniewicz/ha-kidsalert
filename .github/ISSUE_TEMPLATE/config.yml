@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a dangerous trend to KidsAlert
+    url: https://kidsalert.pl
+    about: This repository is the Home Assistant integration only. Alerts themselves are published by KidsAlert.

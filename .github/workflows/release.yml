@@ -1,0 +1,32 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    name: Attach kidsalert.zip
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Check the tag matches every version string
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          manifest=$(jq -r .version custom_components/kidsalert/manifest.json)
+          const=$(sed -n 's/^VERSION: Final = "\(.*\)"/\1/p' custom_components/kidsalert/const.py)
+          card=$(sed -n 's/^const VERSION = "\(.*\)";/\1/p' custom_components/kidsalert/frontend/kidsalert-card.js)
+          echo "tag=$tag manifest=$manifest const=$const card=$card"
+          test "$tag" = "$manifest" && test "$tag" = "$const" && test "$tag" = "$card"
+
+      - name: Build archive
+        working-directory: custom_components/kidsalert
+        run: zip -r "$GITHUB_WORKSPACE/kidsalert.zip" . -x "__pycache__/*"
+
+      - uses: softprops/action-gh-release@v3
+        with:
+          files: kidsalert.zip

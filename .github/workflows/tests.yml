@@ -1,0 +1,63 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+      - run: pip install "$(grep '^ruff==' requirements_test.txt)"
+      - run: ruff check --output-format=github .
+      - run: ruff format --check .
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+      - name: Check card syntax
+        run: node --check custom_components/kidsalert/frontend/kidsalert-card.js
+
+  pytest:
+    name: Pytest (HA ${{ matrix.label }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: "2026.10 (current)"
+            python: "3.14"
+            requirements: requirements_test.txt
+            coverage: true
+          - label: "2025.3 (minimum)"
+            python: "3.13"
+            requirements: requirements_test_min.txt
+            coverage: false
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+          cache-dependency-path: ${{ matrix.requirements }}
+      - run: pip install -r ${{ matrix.requirements }}
+      - name: Run tests
+        run: |
+          if [ "${{ matrix.coverage }}" = "true" ]; then
+            pytest --cov --cov-report=term-missing
+          else
+            pytest
+          fi

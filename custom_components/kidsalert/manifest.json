@@ -1,0 +1,13 @@
+{
+  "domain": "kidsalert",
+  "name": "KidsAlert",
+  "codeowners": ["@MichalZaniewicz"],
+  "config_flow": true,
+  "dependencies": ["frontend", "http", "websocket_api"],
+  "documentation": "https://github.com/MichalZaniewicz/ha-kidsalert",
+  "integration_type": "service",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/MichalZaniewicz/ha-kidsalert/issues",
+  "requirements": [],
+  "version": "0.1.0"
+}

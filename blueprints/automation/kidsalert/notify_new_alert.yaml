@@ -1,0 +1,102 @@
+blueprint:
+  name: KidsAlert – notify about new alerts
+  description: >-
+    Sends a notification whenever KidsAlert publishes a new alert, with the alert
+    image and the first lines of its text. Optionally only for danger alerts.
+
+
+    Wysyła powiadomienie, gdy KidsAlert opublikuje nowy alert – z obrazkiem i
+    początkiem treści. Opcjonalnie tylko dla alertów o zagrożeniu.
+  domain: automation
+  author: MichalZaniewicz
+  homeassistant:
+    min_version: "2025.3.0"
+  source_url: https://github.com/MichalZaniewicz/ha-kidsalert/blob/main/blueprints/automation/kidsalert/notify_new_alert.yaml
+  input:
+    event_entity:
+      name: KidsAlert event entity
+      description: The "New alert" event entity of the KidsAlert integration.
+      selector:
+        entity:
+          filter:
+            - integration: kidsalert
+              domain: event
+    notify_action:
+      name: Notify action
+      description: >-
+        Action that delivers the notification, for example
+        notify.mobile_app_pixel_9 or a notify group such as notify.family.
+      default: notify.notify
+      selector:
+        text: {}
+    only_danger:
+      name: Only danger alerts
+      default: false
+      selector:
+        boolean: {}
+    attach_image:
+      name: Attach the alert image
+      default: true
+      selector:
+        boolean: {}
+    content_length:
+      name: Text length
+      description: Characters of alert text in the notification (0 sends the title only).
+      default: 200
+      selector:
+        number:
+          min: 0
+          max: 500
+          step: 10
+          mode: slider
+    open_path:
+      name: Open on tap
+      description: Dashboard path opened when the notification is tapped, e.g. /lovelace/kids.
+      default: ""
+      selector:
+        text: {}
+
+mode: queued
+max: 10
+
+variables:
+  only_danger: !input only_danger
+  attach_image: !input attach_image
+  content_length: !input content_length
+  open_path: !input open_path
+
+triggers:
+  - trigger: state
+    entity_id: !input event_entity
+    # Skips restores after restarts and reloads; "unknown" is the state before the
+    # very first alert, so a change away from it is a real alert.
+    not_from: unavailable
+
+conditions:
+  - condition: template
+    value_template: >-
+      {{ trigger.to_state.state not in ['unavailable', 'unknown']
+         and (not only_danger or trigger.to_state.attributes.is_danger | default(false)) }}
+
+actions:
+  - variables:
+      alert: "{{ trigger.to_state.attributes }}"
+      excerpt: >-
+        {%- set text = alert.content | default('', true) -%}
+        {%- if content_length | int(0) > 0 and text -%}
+          {{ text[: content_length | int] ~ ('…' if text | length > content_length | int else '') }}
+        {%- endif -%}
+      push_data: >-
+        {%- set data = {'tag': 'kidsalert-' ~ alert.alert_id, 'group': 'kidsalert'} -%}
+        {%- if attach_image and alert.image -%}
+          {%- set data = dict(data, image=alert.image) -%}
+        {%- endif -%}
+        {%- if open_path -%}
+          {%- set data = dict(data, url=open_path, clickAction=open_path) -%}
+        {%- endif -%}
+        {{ data }}
+  - action: !input notify_action
+    data:
+      title: "{{ '⚠️ KidsAlert' if alert.is_danger else 'KidsAlert' }}"
+      message: "{{ alert.title ~ ('\n\n' ~ excerpt if excerpt else '') }}"
+      data: "{{ push_data }}"

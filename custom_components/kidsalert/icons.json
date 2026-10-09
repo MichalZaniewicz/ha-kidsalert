@@ -1,0 +1,22 @@
+{
+  "entity": {
+    "sensor": {
+      "latest_alert": {
+        "default": "mdi:message-alert"
+      }
+    },
+    "binary_sensor": {
+      "danger_alert": {
+        "default": "mdi:shield-check",
+        "state": {
+          "on": "mdi:shield-alert"
+        }
+      }
+    },
+    "event": {
+      "new_alert": {
+        "default": "mdi:bell-ring"
+      }
+    }
+  }
+}

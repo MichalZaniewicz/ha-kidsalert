@@ -1,0 +1,65 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "KidsAlert",
+        "description": "Alerts about online and offline threats to children, published by kidsalert.pl.",
+        "data": {
+          "language": "Alert language"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Could not reach kidsalert.pl. Try again later."
+    },
+    "abort": {
+      "already_configured": "Alerts in this language are already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "scan_interval": "Check for new alerts every",
+          "danger_hours": "Keep the danger sensor on for"
+        },
+        "data_description": {
+          "danger_hours": "How long after a danger alert goes out the danger binary sensor stays on."
+        }
+      }
+    }
+  },
+  "selector": {
+    "language": {
+      "options": {
+        "pl": "Polish",
+        "en": "English"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "latest_alert": {
+        "name": "Latest alert"
+      }
+    },
+    "binary_sensor": {
+      "danger_alert": {
+        "name": "Danger alert"
+      }
+    },
+    "event": {
+      "new_alert": {
+        "name": "New alert",
+        "state_attributes": {
+          "event_type": {
+            "state": {
+              "alert": "Alert",
+              "danger_alert": "Danger alert"
+            }
+          }
+        }
+      }
+    }
+  }
+}

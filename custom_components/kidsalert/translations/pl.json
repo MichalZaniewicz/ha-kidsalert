@@ -1,0 +1,65 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "KidsAlert",
+        "description": "Alerty o zagrożeniach dla dzieci w sieci i poza nią, publikowane przez kidsalert.pl.",
+        "data": {
+          "language": "Język alertów"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Nie udało się połączyć z kidsalert.pl. Spróbuj ponownie później."
+    },
+    "abort": {
+      "already_configured": "Alerty w tym języku są już skonfigurowane."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "scan_interval": "Sprawdzaj nowe alerty co",
+          "danger_hours": "Czujnik zagrożenia włączony przez"
+        },
+        "data_description": {
+          "danger_hours": "Jak długo po wysłaniu alertu o zagrożeniu czujnik binarny pozostaje włączony."
+        }
+      }
+    }
+  },
+  "selector": {
+    "language": {
+      "options": {
+        "pl": "Polski",
+        "en": "Angielski"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "latest_alert": {
+        "name": "Ostatni alert"
+      }
+    },
+    "binary_sensor": {
+      "danger_alert": {
+        "name": "Alert o zagrożeniu"
+      }
+    },
+    "event": {
+      "new_alert": {
+        "name": "Nowy alert",
+        "state_attributes": {
+          "event_type": {
+            "state": {
+              "alert": "Alert",
+              "danger_alert": "Alert o zagrożeniu"
+            }
+          }
+        }
+      }
+    }
+  }
+}

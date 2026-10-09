@@ -1,0 +1,7 @@
+version: 2
+updates:
+  # Test requirements pin exact Home Assistant releases and are bumped by hand.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
