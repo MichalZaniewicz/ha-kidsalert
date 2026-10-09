@@ -49,3 +49,11 @@ def test_brand_icons_are_our_own() -> None:
         "icon.png",
         "icon@2x.png",
     ]
+
+
+def test_readme_images_bust_caches_on_release() -> None:
+    """GitHub, HACS and browsers cache README images; the version query forces a refresh."""
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    urls = re.findall(r"https://raw\.githubusercontent\.com/[^\s\"')]+/docs/[^\s\"')]+", readme)
+    assert urls
+    assert all(url.endswith(f"?v={VERSION}") for url in urls), urls

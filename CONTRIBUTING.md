@@ -43,6 +43,6 @@ Add `?theme=light`, `?lang=pl`, `?open=latest` or `?open=list:2` to check the ot
 
 ## Releasing
 
-Bump the version in `manifest.json`, `const.py`, `kidsalert-card.js` and `pyproject.toml` (a test checks they match), move the *Unreleased* changelog entries under the new version, then publish a GitHub release tagged `vX.Y.Z`. The release workflow checks the tag and attaches `kidsalert.zip`, which HACS installs.
+Bump the version in `manifest.json`, `const.py`, `kidsalert-card.js`, `pyproject.toml` and the `?v=` of the README's image links (tests check they all match; the query makes GitHub, HACS and browsers drop cached images), update it in the wiki's image links too, move the *Unreleased* changelog entries under the new version, then publish a GitHub release tagged `vX.Y.Z`. The release workflow checks the tag and attaches `kidsalert.zip`, which HACS installs.
 
 By participating you agree to the [Code of Conduct](CODE_OF_CONDUCT.md).
