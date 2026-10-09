@@ -1,0 +1,125 @@
+blueprint:
+  name: KidsAlert – push new alerts to Pushbullet
+  description: >-
+    Sends every new KidsAlert alert to Pushbullet: the title, the first lines of
+    the text and the alert image, a link, or the text only. Optionally only for
+    danger alerts.
+
+
+    Wysyła każdy nowy alert KidsAlert na Pushbulleta: tytuł, początek treści
+    oraz obrazek alertu, link albo sam tekst. Opcjonalnie tylko alerty o zagrożeniu.
+  domain: automation
+  author: MichalZaniewicz
+  homeassistant:
+    min_version: "2025.3.0"
+  source_url: https://github.com/MichalZaniewicz/ha-kidsalert/blob/main/blueprints/automation/kidsalert/notify_pushbullet.yaml
+  input:
+    event_entity:
+      name: KidsAlert event entity
+      description: The "New alert" event entity of the KidsAlert integration.
+      selector:
+        entity:
+          filter:
+            - integration: kidsalert
+              domain: event
+    pushbullet_action:
+      name: Pushbullet notify action
+      description: The notify action of your Pushbullet integration.
+      default: notify.pushbullet
+      selector:
+        text: {}
+    targets:
+      name: Targets
+      description: >-
+        Comma-separated Pushbullet targets, e.g. "device/Pixel 9, channel/family,
+        email/me@example.com". Leave empty to push to all your devices.
+      default: ""
+      selector:
+        text: {}
+    only_danger:
+      name: Only danger alerts
+      default: false
+      selector:
+        boolean: {}
+    attachment:
+      name: Attach
+      description: >-
+        Pushbullet sends either a file or a link with a push, not both.
+      default: image
+      selector:
+        select:
+          mode: list
+          options:
+            - label: The alert image
+              value: image
+            - label: A link
+              value: link
+            - label: Nothing, text only
+              value: none
+    link_url:
+      name: Link
+      description: >-
+        Used when Attach is "A link". Leave empty to link the alert on kidsalert.pl,
+        which opens the KidsAlert app on a phone that has it.
+      default: ""
+      selector:
+        text:
+          type: url
+    content_length:
+      name: Text length
+      description: Characters of alert text in the push (0 sends the title only).
+      default: 500
+      selector:
+        number:
+          min: 0
+          max: 500
+          step: 50
+          mode: slider
+
+mode: queued
+max: 10
+
+variables:
+  only_danger: !input only_danger
+  attachment: !input attachment
+  link_url: !input link_url
+  content_length: !input content_length
+  targets_text: !input targets
+
+triggers:
+  - trigger: state
+    entity_id: !input event_entity
+    # Skips restores after restarts and reloads; "unknown" is the state before the
+    # very first alert, so a change away from it is a real alert.
+    not_from: unavailable
+
+conditions:
+  - condition: template
+    value_template: >-
+      {{ trigger.to_state.state not in ['unavailable', 'unknown']
+         and (not only_danger or trigger.to_state.attributes.is_danger | default(false)) }}
+
+actions:
+  - variables:
+      alert: "{{ trigger.to_state.attributes }}"
+      excerpt: >-
+        {%- set text = alert.content | default('', true) -%}
+        {%- if content_length | int(0) > 0 and text -%}
+          {{ text[: content_length | int] ~ ('…' if text | length > content_length | int else '') }}
+        {%- endif -%}
+      push_targets: >-
+        {{ targets_text.split(',') | map('trim') | reject('eq', '') | list }}
+      push_data: >-
+        {%- if attachment == 'image' and alert.image -%}
+          {{ {'file_url': alert.image} }}
+        {%- elif attachment == 'link' -%}
+          {{ {'url': link_url if link_url else 'https://kidsalert.pl/notification/' ~ alert.alert_id ~ '/'} }}
+        {%- else -%}
+          {{ {} }}
+        {%- endif -%}
+  - action: !input pushbullet_action
+    data:
+      title: "{{ ('⚠️ ' if alert.is_danger else '') ~ 'KidsAlert: ' ~ alert.title }}"
+      message: "{{ excerpt if excerpt else alert.title }}"
+      target: "{{ push_targets }}"
+      data: "{{ push_data }}"

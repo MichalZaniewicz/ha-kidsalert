@@ -36,7 +36,7 @@ into <ha-alert> and drops every child whose textContent is empty, which silently
 ![KidsAlert for Home Assistant: the cards, the alert dialog, sensitive content and Polish](https://raw.githubusercontent.com/MichalZaniewicz/ha-kidsalert/main/docs/trailer.webp?v=0.1.2)
 
 - 🚨 **Know the moment an alert goes out.** Every new alert fires an event with its title, a plain-text excerpt and the image, once. Alerts published while Home Assistant was off are announced when it's back.
-- 📱 **A notification on your phone in one click.** A ready-made blueprint sends the image and the first lines of the alert, opens your dashboard on tap, and can be limited to danger alerts.
+- 📱 **A notification on your phone in one click.** Ready-made blueprints for the Companion app and for Pushbullet send the image and the first lines of the alert, and can be limited to danger alerts.
 - 🛡️ **A danger switch for your home.** A binary sensor stays on for a few hours after a danger alert: turn a light red, play an announcement, or show a banner on the wall tablet.
 - 🖼️ **Two dashboard cards, already inside.** The latest alert and a list of recent ones. Nothing else to download from HACS and no resource to register; both have a visual editor.
 - 📖 **The whole alert, without leaving Home Assistant.** Tap an alert for its full text, the image and the video. The text is cleaned before display, so a script or a frame can't sneak onto your dashboard.
@@ -50,11 +50,12 @@ into <ha-alert> and drops every child whose textContent is empty, which silently
 
 ## Notifications
 
-Import the blueprint, pick your phone's notify action, and decide whether you want every alert or danger alerts only.
+Two ready-made blueprints: import one, pick where the alerts go, and decide whether you want every alert or danger alerts only.
 
-<p align="center">
-  <a href="https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FMichalZaniewicz%2Fha-kidsalert%2Fblob%2Fmain%2Fblueprints%2Fautomation%2Fkidsalert%2Fnotify_new_alert.yaml"><img alt="Open your Home Assistant instance and show the blueprint import dialog with this blueprint pre-filled." src="https://my.home-assistant.io/badges/blueprint_import.svg"></a>
-</p>
+| Blueprint | Sends | Import |
+| --- | --- | --- |
+| **Phone notification** | The Home Assistant Companion app, or any notify action: image, first lines, your dashboard on tap | <a href="https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FMichalZaniewicz%2Fha-kidsalert%2Fblob%2Fmain%2Fblueprints%2Fautomation%2Fkidsalert%2Fnotify_new_alert.yaml"><img alt="Import the phone notification blueprint" src="https://my.home-assistant.io/badges/blueprint_import.svg"></a> |
+| **Pushbullet** | A Pushbullet push to all your devices or chosen ones: the text with the alert image, or a link | <a href="https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FMichalZaniewicz%2Fha-kidsalert%2Fblob%2Fmain%2Fblueprints%2Fautomation%2Fkidsalert%2Fnotify_pushbullet.yaml"><img alt="Import the Pushbullet blueprint" src="https://my.home-assistant.io/badges/blueprint_import.svg"></a> |
 
 Prefer your own automation? Trigger on the **New alert** event entity or the `kidsalert_new_alert` event. **[Examples and every field](https://github.com/MichalZaniewicz/ha-kidsalert/wiki/Notifications)**
 

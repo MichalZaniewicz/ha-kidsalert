@@ -6,6 +6,10 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- Pushbullet blueprint: every new alert as a push with the alert image, a link or the text only, to all your devices or chosen targets.
+
 ## [0.1.2] - 2026-10-10
 
 ### Changed
