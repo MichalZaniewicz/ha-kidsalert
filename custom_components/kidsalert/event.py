@@ -26,6 +26,8 @@ class KidsAlertEventEntity(KidsAlertEntity, EventEntity):
     """Fires `alert` or `danger_alert` when a new alert is published."""
 
     _attr_event_types = [EVENT_TYPE_ALERT, EVENT_TYPE_DANGER]
+    # The full alert text stays on the state for automations, out of the history database.
+    _unrecorded_attributes = frozenset({"content"})
 
     async def async_added_to_hass(self) -> None:
         await super().async_added_to_hass()

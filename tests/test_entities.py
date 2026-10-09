@@ -10,6 +10,7 @@ import pytest
 from pytest_homeassistant_custom_component.common import MockConfigEntry, async_fire_time_changed
 
 from custom_components.kidsalert.const import CONF_DANGER_HOURS, CONF_SCAN_INTERVAL
+from custom_components.kidsalert.event import KidsAlertEventEntity
 from homeassistant.const import STATE_OFF, STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
@@ -50,6 +51,10 @@ async def test_latest_alert_sensor(
     )
     assert state.attributes["sent_at"] == "2026-10-08T15:00:51.947675+02:00"
     assert state.attributes["language"] == "pl"
+
+
+def test_event_text_is_kept_out_of_the_history_database() -> None:
+    assert "content" in KidsAlertEventEntity._unrecorded_attributes
 
 
 @pytest.mark.freeze_time(NOW)

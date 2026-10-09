@@ -1,6 +1,6 @@
 [project]
 name = "ha-kidsalert"
-version = "0.1.2"
+version = "0.1.3"
 description = "Home Assistant integration for KidsAlert (kidsalert.pl) alerts with bundled dashboard cards"
 readme = "README.md"
 license = "MIT"

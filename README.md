@@ -1,7 +1,7 @@
 # KidsAlert (unofficial) for Home Assistant
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/MichalZaniewicz/ha-kidsalert/main/docs/hero-banner.svg?v=0.1.2" alt="KidsAlert for Home Assistant">
+  <img src="https://raw.githubusercontent.com/MichalZaniewicz/ha-kidsalert/main/docs/hero-banner.svg?v=0.1.3" alt="KidsAlert for Home Assistant">
 </p>
 
 <p align="center">
@@ -33,10 +33,10 @@ into <ha-alert> and drops every child whose textContent is empty, which silently
 
 ## What it does
 
-![KidsAlert for Home Assistant: the cards, the alert dialog, sensitive content and Polish](https://raw.githubusercontent.com/MichalZaniewicz/ha-kidsalert/main/docs/trailer.webp?v=0.1.2)
+![KidsAlert for Home Assistant: the cards, the alert dialog, sensitive content and Polish](https://raw.githubusercontent.com/MichalZaniewicz/ha-kidsalert/main/docs/trailer.webp?v=0.1.3)
 
-- 🚨 **Know the moment an alert goes out.** Every new alert fires an event with its title, a plain-text excerpt and the image, once. Alerts published while Home Assistant was off are announced when it's back.
-- 📱 **A notification on your phone in one click.** Ready-made blueprints for the Companion app and for Pushbullet send the image and the first lines of the alert, and can be limited to danger alerts.
+- 🚨 **Know the moment an alert goes out.** Every new alert fires an event with its title, its full text and the image, once. Alerts published while Home Assistant was off are announced when it's back.
+- 📱 **A notification on your phone in one click.** Ready-made blueprints for the Companion app and for Pushbullet send the image and the alert text, in full on Pushbullet, and can be limited to danger alerts.
 - 🛡️ **A danger switch for your home.** A binary sensor stays on for a few hours after a danger alert: turn a light red, play an announcement, or show a banner on the wall tablet.
 - 🖼️ **Two dashboard cards, already inside.** The latest alert and a list of recent ones. Nothing else to download from HACS and no resource to register; both have a visual editor.
 - 📖 **The whole alert, without leaving Home Assistant.** Tap an alert for its full text, the image and the video. The text is cleaned before display, so a script or a frame can't sneak onto your dashboard.
@@ -45,7 +45,7 @@ into <ha-alert> and drops every child whose textContent is empty, which silently
 - 🪶 **Light on a non-profit service.** One small request every 10 minutes by default, the full text only for new alerts, no account and no personal data.
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/MichalZaniewicz/ha-kidsalert/main/docs/notifications-banner.svg?v=0.1.2" alt="Notifications">
+  <img src="https://raw.githubusercontent.com/MichalZaniewicz/ha-kidsalert/main/docs/notifications-banner.svg?v=0.1.3" alt="Notifications">
 </p>
 
 ## Notifications
@@ -55,28 +55,28 @@ Two ready-made blueprints: import one, pick where the alerts go, and decide whet
 | Blueprint | Sends | Import |
 | --- | --- | --- |
 | **Phone notification** | The Home Assistant Companion app, or any notify action: image, first lines, your dashboard on tap | <a href="https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FMichalZaniewicz%2Fha-kidsalert%2Fblob%2Fmain%2Fblueprints%2Fautomation%2Fkidsalert%2Fnotify_new_alert.yaml"><img alt="Import the phone notification blueprint" src="https://my.home-assistant.io/badges/blueprint_import.svg"></a> |
-| **Pushbullet** | A Pushbullet push to all your devices or chosen ones: the text with the alert image, or a link | <a href="https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FMichalZaniewicz%2Fha-kidsalert%2Fblob%2Fmain%2Fblueprints%2Fautomation%2Fkidsalert%2Fnotify_pushbullet.yaml"><img alt="Import the Pushbullet blueprint" src="https://my.home-assistant.io/badges/blueprint_import.svg"></a> |
+| **Pushbullet** | A Pushbullet push to all your devices or chosen ones: the full text with the alert image, or a link | <a href="https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FMichalZaniewicz%2Fha-kidsalert%2Fblob%2Fmain%2Fblueprints%2Fautomation%2Fkidsalert%2Fnotify_pushbullet.yaml"><img alt="Import the Pushbullet blueprint" src="https://my.home-assistant.io/badges/blueprint_import.svg"></a> |
 
 Prefer your own automation? Trigger on the **New alert** event entity or the `kidsalert_new_alert` event. **[Examples and every field](https://github.com/MichalZaniewicz/ha-kidsalert/wiki/Notifications)**
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/MichalZaniewicz/ha-kidsalert/main/docs/cards-banner.svg?v=0.1.2" alt="Dashboard cards">
+  <img src="https://raw.githubusercontent.com/MichalZaniewicz/ha-kidsalert/main/docs/cards-banner.svg?v=0.1.3" alt="Dashboard cards">
 </p>
 
 ## Dashboard cards
 
 The cards install and register with the integration. Open a dashboard, **Add card**, search for **KidsAlert**, and they find your alerts on their own. They follow your light or dark theme and your Home Assistant language.
 
-![Latest alert and recent alerts cards](https://raw.githubusercontent.com/MichalZaniewicz/ha-kidsalert/main/docs/images/cards.png?v=0.1.2)
+![Latest alert and recent alerts cards](https://raw.githubusercontent.com/MichalZaniewicz/ha-kidsalert/main/docs/images/cards.png?v=0.1.3)
 
 Tap any alert to read it in full:
 
-![Alert details dialog](https://raw.githubusercontent.com/MichalZaniewicz/ha-kidsalert/main/docs/images/dialog.png?v=0.1.2)
+![Alert details dialog](https://raw.githubusercontent.com/MichalZaniewicz/ha-kidsalert/main/docs/images/dialog.png?v=0.1.3)
 
 <sub>Screenshots show made-up demo alerts.</sub> **[Card options](https://github.com/MichalZaniewicz/ha-kidsalert/wiki/Cards)**
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/MichalZaniewicz/ha-kidsalert/main/docs/installation-banner.svg?v=0.1.2" alt="Installation">
+  <img src="https://raw.githubusercontent.com/MichalZaniewicz/ha-kidsalert/main/docs/installation-banner.svg?v=0.1.3" alt="Installation">
 </p>
 
 ## Get started

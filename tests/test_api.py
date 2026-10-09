@@ -69,8 +69,19 @@ def test_html_to_text() -> None:
         "<p>Pierwszy&nbsp;akapit &amp; więcej</p>\r\n<ul><li>Jeden</li><li>Dwa</li></ul>"
         "<style>p{}</style><script>alert(1)</script>Linia<br>Druga"
     )
-    assert html_to_text(html) == "Pierwszy\xa0akapit & więcej\nJeden\nDwa\nLinia\nDruga"
+    assert html_to_text(html) == "Pierwszy\xa0akapit & więcej\n\n• Jeden\n• Dwa\nLinia\nDruga"
     assert html_to_text(None) == ""
+
+
+def test_html_to_text_keeps_link_addresses() -> None:
+    html = (
+        '<p>See <a href="https://raport.kidsalert.pl/">the report</a>.</p>'
+        '<p><a href="https://youtu.be/x">https://youtu.be/x</a></p>'
+        '<p><a href="mailto:a@b.pl">write to us</a></p>'
+    )
+    assert html_to_text(html) == (
+        "See the report (https://raport.kidsalert.pl/).\n\nhttps://youtu.be/x\n\nwrite to us"
+    )
 
 
 def test_normalize_alert_rejects_non_http_media() -> None:

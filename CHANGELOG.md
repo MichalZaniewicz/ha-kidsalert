@@ -6,9 +6,16 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.3] - 2026-10-10
+
 ### Added
 
-- Pushbullet blueprint: every new alert as a push with the alert image, a link or the text only, to all your devices or chosen targets.
+- Pushbullet blueprint: every new alert as a push with the full text and the alert image, a link or the text only, to all your devices or chosen targets.
+
+### Changed
+
+- The `kidsalert_new_alert` event and the event entity carry the whole alert text instead of the first 500 characters. The event entity keeps it out of the history database.
+- Alert text in events reads better: a blank line between paragraphs, • for list items, and link addresses kept next to the link text.
 
 ## [0.1.2] - 2026-10-10
 
@@ -40,7 +47,8 @@ All notable changes to this project are documented here. The format follows
 - Notification blueprint.
 - Diagnostics and brand icons.
 
-[Unreleased]: https://github.com/MichalZaniewicz/ha-kidsalert/compare/v0.1.2...HEAD
+[Unreleased]: https://github.com/MichalZaniewicz/ha-kidsalert/compare/v0.1.3...HEAD
+[0.1.3]: https://github.com/MichalZaniewicz/ha-kidsalert/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/MichalZaniewicz/ha-kidsalert/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/MichalZaniewicz/ha-kidsalert/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/MichalZaniewicz/ha-kidsalert/releases/tag/v0.1.0

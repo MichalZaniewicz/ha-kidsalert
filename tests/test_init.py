@@ -107,9 +107,11 @@ async def test_new_alert_fires_bus_event_and_event_entity(
     assert data["content"].startswith("Stanowisko KidsAlert jest jednoznaczne: CHALLENGE NIE MA!")
     assert "alert(1)" not in data["content"]
     assert "<" not in data["content"]
+    assert data["content"].endswith("Więcej: https://kidsalert.pl/")
 
     event_state = hass.states.get(EVENT)
     assert event_state.attributes["event_type"] == "danger_alert"
+    assert event_state.attributes["content"] == data["content"]
     assert event_state.attributes["alert_id"] == 103
     assert hass.states.get(SENSOR).state == "Alert 103"
     # The excerpt belongs to the event only, not to the list the cards read.

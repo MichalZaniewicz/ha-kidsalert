@@ -31,19 +31,43 @@ from .const import (
 _LOGGER = logging.getLogger(__name__)
 
 _HIDDEN_RE = re.compile(r"<(script|style)\b.*?</\1\s*>", re.IGNORECASE | re.DOTALL)
+_LINK_RE = re.compile(
+    r"<a\b[^>]*?href\s*=\s*[\"']([^\"']+)[\"'][^>]*>(.*?)</a\s*>", re.IGNORECASE | re.DOTALL
+)
+_LIST_ITEM_RE = re.compile(r"<li\b[^>]*>", re.IGNORECASE)
+_PARAGRAPH_END_RE = re.compile(r"</(p|h[1-6]|blockquote)\s*>", re.IGNORECASE)
+_LINE_END_RE = re.compile(r"</(div|ul|ol)\s*>|<br\s*/?>", re.IGNORECASE)
 _TAG_RE = re.compile(r"<[^>]+>")
-_BLOCK_END_RE = re.compile(r"</(p|li|h[1-6]|div)>|<br\s*/?>", re.IGNORECASE)
 _SPACE_RE = re.compile(r"[ \t\r\f\v]+")
 
 
+def _link_text(match: re.Match[str]) -> str:
+    """Keep a link's address next to its text, unless the text already shows it."""
+    href = html.unescape(match.group(1)).strip()
+    label = match.group(2)
+    if not href.startswith(("https://", "http://")) or href in html.unescape(
+        _TAG_RE.sub("", label)
+    ):
+        return label
+    return f"{label} ({href})"
+
+
 def html_to_text(value: str | None) -> str:
-    """Flatten alert HTML into plain text for notifications."""
+    """Flatten alert HTML into plain text: blank lines between paragraphs, • for list items."""
     if not value:
         return ""
-    text = _BLOCK_END_RE.sub("\n", _HIDDEN_RE.sub("", value))
+    text = _LINK_RE.sub(_link_text, _HIDDEN_RE.sub("", value))
+    text = _LIST_ITEM_RE.sub("\n• ", text)
+    text = _PARAGRAPH_END_RE.sub("\n\n", text)
+    text = _LINE_END_RE.sub("\n", text)
     text = html.unescape(_TAG_RE.sub("", text))
-    lines = (_SPACE_RE.sub(" ", line).strip() for line in text.splitlines())
-    return "\n".join(line for line in lines if line)
+    lines: list[str] = []
+    for raw in text.splitlines():
+        line = _SPACE_RE.sub(" ", raw).strip()
+        # Keep at most one blank line, and none at the start.
+        if line or (lines and lines[-1]):
+            lines.append(line)
+    return "\n".join(lines).strip()
 
 
 def _media_url(value: Any) -> str | None:

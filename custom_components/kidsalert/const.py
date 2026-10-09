@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Final
 
 DOMAIN: Final = "kidsalert"
-VERSION: Final = "0.1.2"
+VERSION: Final = "0.1.3"
 
 API_BASE_URL: Final = "https://kidsalert.pl"
 
@@ -27,8 +27,9 @@ MAX_DANGER_HOURS: Final = 168
 
 # Cap on events fired after a long downtime, so a backlog does not flood automations.
 MAX_EVENTS_PER_UPDATE: Final = 10
-# Characters of plain-text content attached to events.
-EVENT_CONTENT_LENGTH: Final = 500
+# Safety cap on the plain-text content attached to events; real alerts are a few
+# thousand characters, so in practice events carry the whole text.
+EVENT_CONTENT_LENGTH: Final = 20_000
 DETAIL_CACHE_SECONDS: Final = 3600
 
 EVENT_NEW_ALERT: Final = "kidsalert_new_alert"

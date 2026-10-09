@@ -65,14 +65,17 @@ async def test_pushes_image_by_default(
     pushes: list[ServiceCall],
 ) -> None:
     await setup_entry(hass, config_entry)
-    await setup_blueprint(hass, tmp_path, content_length=20)
+    await setup_blueprint(hass, tmp_path)
 
     await publish(hass, mock_api, freezer, danger=True)
 
     assert len(pushes) == 1
     assert pushes[0].data == {
         "title": "⚠️ KidsAlert: Alert 103",
-        "message": "Stanowisko KidsAlert…",
+        "message": (
+            "Stanowisko KidsAlert jest jednoznaczne: CHALLENGE NIE MA!\n\n"
+            "• Rozmawiaj z dzieckiem\n• Sprawdź telefon\nWięcej: https://kidsalert.pl/"
+        ),
         "target": [],
         "data": {"file_url": "https://kidsalert.pl/media/alerts/new.jpeg"},
     }
@@ -128,12 +131,29 @@ async def test_text_only_and_title_only(
     pushes: list[ServiceCall],
 ) -> None:
     await setup_entry(hass, config_entry)
-    await setup_blueprint(hass, tmp_path, attachment="none", content_length=0)
+    await setup_blueprint(hass, tmp_path, attachment="none", full_text=False, content_length=0)
 
     await publish(hass, mock_api, freezer, danger=False)
 
     assert pushes[0].data["message"] == "Alert 103"
     assert pushes[0].data["data"] == {}
+
+
+@pytest.mark.freeze_time(NOW)
+async def test_beginning_only(
+    hass: HomeAssistant,
+    tmp_path: Path,
+    config_entry: MockConfigEntry,
+    mock_api: AsyncMock,
+    freezer: FrozenDateTimeFactory,
+    pushes: list[ServiceCall],
+) -> None:
+    await setup_entry(hass, config_entry)
+    await setup_blueprint(hass, tmp_path, full_text=False, content_length=20)
+
+    await publish(hass, mock_api, freezer, danger=False)
+
+    assert pushes[0].data["message"] == "Stanowisko KidsAlert…"
 
 
 @pytest.mark.freeze_time(NOW)
