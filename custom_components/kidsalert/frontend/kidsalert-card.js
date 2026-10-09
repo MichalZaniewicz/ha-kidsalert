@@ -1,6 +1,6 @@
 /* KidsAlert dashboard cards, served and registered by the kidsalert integration. */
 
-const VERSION = "0.1.0";
+const VERSION = "0.1.1";
 const DOMAIN = "kidsalert";
 
 const STRINGS = {
@@ -17,6 +17,8 @@ const STRINGS = {
     no_entry: "Nie znaleziono integracji KidsAlert. Dodaj ją w Ustawienia → Urządzenia i usługi.",
     error: "Nie udało się pobrać alertów",
     close: "Zamknij",
+    video: "Wideo",
+    hide_video: "Ukryj wideo",
     entity: "Encja (KidsAlert – ostatni alert)",
     title: "Tytuł karty",
     show_image: "Pokaż obrazek",
@@ -38,6 +40,8 @@ const STRINGS = {
     no_entry: "KidsAlert integration not found. Add it under Settings → Devices & services.",
     error: "Could not load alerts",
     close: "Close",
+    video: "Video",
+    hide_video: "Hide video",
     entity: "Entity (KidsAlert latest alert)",
     title: "Card title",
     show_image: "Show image",
@@ -264,64 +268,102 @@ class KidsAlertDialog extends HTMLElement {
   _render(alert, loading, failed = false) {
     const hass = this.hass;
     const image = safeUrl(alert.image);
+    const thumb = safeUrl(alert.thumbnail) || image;
     const video = safeUrl(alert.video);
     const hidden = alert.is_sensitive && !this._revealed;
-    let media = "";
-    if (video) {
-      media = `<video class="media" controls preload="metadata" src="${esc(video)}" ${image ? `poster="${esc(image)}"` : ""}></video>`;
-    } else if (image) {
-      media = `<div class="media-wrap ${hidden ? "clickable" : ""}" ${hidden ? 'role="button" tabindex="0"' : ""}>
-          <img class="media ${hidden ? "blur" : ""}" src="${esc(image)}" alt="" referrerpolicy="no-referrer">
-          ${hidden ? `<div class="veil">${esc(tr(hass, "sensitive"))}<br><small>${esc(tr(hass, "reveal"))}</small></div>` : ""}
-        </div>`;
-    }
     this.shadowRoot.innerHTML = `
       <style>
         ${BASE_STYLE}
         .backdrop { position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,.6); display: flex; align-items: center; justify-content: center; padding: 16px; box-sizing: border-box; }
-        .panel { position: relative; width: min(680px, 100%); max-height: calc(100vh - 32px); overflow-y: auto; border-radius: var(--ha-card-border-radius, 12px); background: var(--card-background-color, var(--ha-card-background, #fff)); color: var(--primary-text-color); box-shadow: 0 8px 32px rgba(0,0,0,.4); }
+        .panel { width: min(680px, 100%); max-height: calc(100vh - 32px); overflow-y: auto; border-radius: var(--ha-card-border-radius, 12px); background: var(--card-background-color, var(--ha-card-background, #fff)); color: var(--primary-text-color); box-shadow: 0 8px 32px rgba(0,0,0,.4); }
         .panel.danger { border-top: 6px solid var(--error-color, #db4437); }
-        .close { position: absolute; top: 8px; right: 8px; z-index: 2; width: 40px; height: 40px; border: none; border-radius: 50%; background: rgba(0,0,0,.45); color: #fff; font-size: 22px; line-height: 40px; cursor: pointer; }
-        .media-wrap { position: relative; overflow: hidden; }
-        .media { display: block; width: 100%; max-height: 60vh; object-fit: contain; background: #000; }
-        .veil { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; font-weight: 600; text-align: center; background: rgba(0,0,0,.35); }
-        .body { padding: 16px 20px 24px; }
-        .badges { display: flex; gap: 6px; margin-bottom: 8px; }
-        h2 { margin: 0 0 4px; font-size: 22px; line-height: 1.3; }
-        .content { margin-top: 16px; line-height: 1.55; font-size: 15px; overflow-wrap: anywhere; }
+        .panel:focus { outline: none; }
+        .head { display: flex; gap: 16px; align-items: flex-start; padding: 20px 12px 0 20px; }
+        .thumb { position: relative; flex: 0 0 96px; width: 96px; height: 96px; padding: 0; border: none; border-radius: 10px; overflow: hidden; cursor: zoom-in; background: var(--secondary-background-color, #eee); }
+        .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; transition: filter .2s; }
+        .thumb .veil { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 4px; color: #fff; font-size: 11px; font-weight: 600; line-height: 1.2; text-align: center; background: rgba(0,0,0,.35); }
+        .thumb:not(.hidden) .veil { display: none; }
+        .thumb.hidden { cursor: pointer; }
+        .thumb.hidden img { filter: blur(12px); transform: scale(1.1); }
+        .thumb:focus-visible, .chip:focus-visible, .close:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
+        .heading { flex: 1; min-width: 0; padding-top: 2px; }
+        .badges { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 6px; }
+        h2 { margin: 0 0 4px; font-size: 20px; line-height: 1.3; overflow-wrap: anywhere; }
+        .chip { margin-top: 10px; padding: 6px 12px; border: 1px solid var(--divider-color, rgba(0,0,0,.12)); border-radius: 999px; background: none; color: var(--primary-color); font: inherit; font-size: 13px; font-weight: 500; cursor: pointer; }
+        .close { flex: 0 0 40px; width: 40px; height: 40px; margin-top: -8px; border: none; border-radius: 50%; background: none; color: var(--secondary-text-color); font-size: 24px; line-height: 40px; cursor: pointer; }
+        .close:hover, .chip:hover { background: var(--secondary-background-color, rgba(0,0,0,.06)); }
+        .full { margin: 16px 20px 0; border-radius: 10px; overflow: hidden; background: #000; }
+        .full img, .full video { display: block; width: 100%; max-height: 60vh; object-fit: contain; }
+        .full img { cursor: zoom-out; }
+        [hidden] { display: none !important; }
+        .content { padding: 4px 20px 24px; line-height: 1.55; font-size: 15px; overflow-wrap: anywhere; }
         .content img { max-width: 100%; height: auto; }
         .content a { color: var(--primary-color); }
+        @media (max-width: 480px) {
+          .head { gap: 12px; padding: 16px 8px 0 16px; }
+          .thumb { flex-basis: 72px; width: 72px; height: 72px; }
+          h2 { font-size: 18px; }
+          .full { margin: 12px 16px 0; }
+          .content { padding: 4px 16px 20px; }
+        }
       </style>
       <div class="backdrop">
-        <div class="panel ${alert.is_danger ? "danger" : ""}" role="dialog" aria-modal="true" aria-label="${esc(alert.title)}">
-          <button class="close" aria-label="${esc(tr(hass, "close"))}">×</button>
-          ${media}
-          <div class="body">
-            ${alert.is_danger || alert.is_sensitive ? `<div class="badges">
-              ${alert.is_danger ? `<span class="badge">${esc(tr(hass, "danger"))}</span>` : ""}
-              ${alert.is_sensitive ? `<span class="badge sensitive">${esc(tr(hass, "sensitive"))}</span>` : ""}
-            </div>` : ""}
-            <h2>${esc(alert.title)}</h2>
-            <div class="meta">${esc(formatDate(hass, alert.sent_at))}</div>
-            <div class="content">${loading ? `<p class="meta">${esc(tr(hass, "loading"))}</p>` : ""}${failed ? `<p class="state error">${esc(tr(hass, "error"))}</p>` : ""}</div>
+        <div class="panel ${alert.is_danger ? "danger" : ""}" role="dialog" aria-modal="true" aria-label="${esc(alert.title)}" tabindex="-1">
+          <div class="head">
+            ${thumb ? `<button class="thumb ${hidden ? "hidden" : ""}" aria-label="${esc(tr(hass, hidden ? "reveal" : "show_image"))}">
+              <img src="${esc(thumb)}" alt="" referrerpolicy="no-referrer">
+              <span class="veil">${esc(tr(hass, "sensitive"))}</span>
+            </button>` : ""}
+            <div class="heading">
+              ${alert.is_danger || alert.is_sensitive ? `<div class="badges">
+                ${alert.is_danger ? `<span class="badge">${esc(tr(hass, "danger"))}</span>` : ""}
+                ${alert.is_sensitive ? `<span class="badge sensitive">${esc(tr(hass, "sensitive"))}</span>` : ""}
+              </div>` : ""}
+              <h2>${esc(alert.title)}</h2>
+              <div class="meta">${esc(formatDate(hass, alert.sent_at))}</div>
+              ${video ? `<button class="chip video-toggle" aria-expanded="false">▶ ${esc(tr(hass, "video"))}</button>` : ""}
+            </div>
+            <button class="close" aria-label="${esc(tr(hass, "close"))}">×</button>
           </div>
+          ${image ? `<div class="full image" hidden><img src="${esc(image)}" alt="" referrerpolicy="no-referrer"></div>` : ""}
+          ${video ? `<div class="full video" hidden><video controls preload="none" src="${esc(video)}" ${image ? `poster="${esc(image)}"` : ""}></video></div>` : ""}
+          <div class="content">${loading ? `<p class="meta">${esc(tr(hass, "loading"))}</p>` : ""}${failed ? `<p class="state error">${esc(tr(hass, "error"))}</p>` : ""}</div>
         </div>
       </div>`;
-    if (!loading && !failed) this.shadowRoot.querySelector(".content").appendChild(sanitizeHtml(alert.content));
-    this._alert = alert;
     const root = this.shadowRoot;
+    if (!loading && !failed) root.querySelector(".content").appendChild(sanitizeHtml(alert.content));
     root.querySelector(".backdrop").addEventListener("click", (ev) => ev.target === ev.currentTarget && this.close());
     root.querySelector(".close").addEventListener("click", () => this.close());
-    const veil = root.querySelector(".media-wrap.clickable");
-    if (veil) {
-      const reveal = () => {
+
+    const thumbButton = root.querySelector(".thumb");
+    const fullImage = root.querySelector(".full.image");
+    thumbButton?.addEventListener("click", () => {
+      // A sensitive image is revealed first; after that the thumbnail opens the full image.
+      if (thumbButton.classList.contains("hidden")) {
         this._revealed = true;
-        this._render(this._alert, loading, failed);
-      };
-      veil.addEventListener("click", reveal);
-      veil.addEventListener("keydown", (ev) => (ev.key === "Enter" || ev.key === " ") && reveal());
-    }
-    root.querySelector(".close").focus({ preventScroll: true });
+        thumbButton.classList.remove("hidden");
+        thumbButton.setAttribute("aria-label", tr(hass, "show_image"));
+      } else if (fullImage) {
+        fullImage.hidden = !fullImage.hidden;
+      }
+    });
+    fullImage?.addEventListener("click", () => {
+      fullImage.hidden = true;
+    });
+
+    const videoToggle = root.querySelector(".video-toggle");
+    const videoBox = root.querySelector(".full.video");
+    videoToggle?.addEventListener("click", () => {
+      const player = videoBox.querySelector("video");
+      videoBox.hidden = !videoBox.hidden;
+      videoToggle.setAttribute("aria-expanded", String(!videoBox.hidden));
+      videoToggle.textContent = videoBox.hidden ? `▶ ${tr(hass, "video")}` : `■ ${tr(hass, "hide_video")}`;
+      if (videoBox.hidden) player.pause();
+      else player.play().catch(() => {});
+    });
+
+    // Focus the dialog itself so keyboard users land inside it without a ring on the close button.
+    root.querySelector(".panel").focus({ preventScroll: true });
   }
 }
 
