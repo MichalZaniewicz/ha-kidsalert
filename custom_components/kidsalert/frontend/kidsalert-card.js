@@ -1,6 +1,6 @@
 /* KidsAlert dashboard cards, served and registered by the kidsalert integration. */
 
-const VERSION = "0.1.1";
+const VERSION = "0.1.2";
 const DOMAIN = "kidsalert";
 
 const STRINGS = {
@@ -297,6 +297,9 @@ class KidsAlertDialog extends HTMLElement {
         .full img { cursor: zoom-out; }
         [hidden] { display: none !important; }
         .content { padding: 4px 20px 24px; line-height: 1.55; font-size: 15px; overflow-wrap: anywhere; }
+        .fade { position: sticky; bottom: 0; height: 48px; margin-top: -48px; pointer-events: none;
+          background: linear-gradient(to bottom, transparent, var(--card-background-color, var(--ha-card-background, #fff))); }
+        .fade.done { opacity: 0; }
         .content img { max-width: 100%; height: auto; }
         .content a { color: var(--primary-color); }
         @media (max-width: 480px) {
@@ -328,6 +331,7 @@ class KidsAlertDialog extends HTMLElement {
           ${image ? `<div class="full image" hidden><img src="${esc(image)}" alt="" referrerpolicy="no-referrer"></div>` : ""}
           ${video ? `<div class="full video" hidden><video controls preload="none" src="${esc(video)}" ${image ? `poster="${esc(image)}"` : ""}></video></div>` : ""}
           <div class="content">${loading ? `<p class="meta">${esc(tr(hass, "loading"))}</p>` : ""}${failed ? `<p class="state error">${esc(tr(hass, "error"))}</p>` : ""}</div>
+          <div class="fade done"></div>
         </div>
       </div>`;
     const root = this.shadowRoot;
@@ -345,11 +349,23 @@ class KidsAlertDialog extends HTMLElement {
         thumbButton.setAttribute("aria-label", tr(hass, "show_image"));
       } else if (fullImage) {
         fullImage.hidden = !fullImage.hidden;
+        updateFade();
       }
     });
     fullImage?.addEventListener("click", () => {
       fullImage.hidden = true;
+      updateFade();
     });
+
+    // Fade the bottom edge while more text is below, so long alerts don't end mid-line.
+    const panel = root.querySelector(".panel");
+    const fade = root.querySelector(".fade");
+    const updateFade = () => {
+      fade.classList.toggle("done", panel.scrollTop + panel.clientHeight >= panel.scrollHeight - 4);
+    };
+    panel.addEventListener("scroll", updateFade, { passive: true });
+    requestAnimationFrame(updateFade);
+    root.querySelectorAll("img").forEach((img) => img.addEventListener("load", updateFade));
 
     const videoToggle = root.querySelector(".video-toggle");
     const videoBox = root.querySelector(".full.video");
@@ -360,6 +376,7 @@ class KidsAlertDialog extends HTMLElement {
       videoToggle.textContent = videoBox.hidden ? `▶ ${tr(hass, "video")}` : `■ ${tr(hass, "hide_video")}`;
       if (videoBox.hidden) player.pause();
       else player.play().catch(() => {});
+      updateFade();
     });
 
     // Focus the dialog itself so keyboard users land inside it without a ring on the close button.

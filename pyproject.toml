@@ -1,6 +1,6 @@
 [project]
 name = "ha-kidsalert"
-version = "0.1.1"
+version = "0.1.2"
 description = "Home Assistant integration for KidsAlert (kidsalert.pl) alerts with bundled dashboard cards"
 readme = "README.md"
 license = "MIT"
@@ -38,6 +38,8 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["D", "PLR0917", "RUF001", "S101", "SLF001", "PLC0415"]
+# A build tool full of SVG markup: long lines, prints and a Chrome subprocess are the point.
+"scripts/**" = ["E501", "RUF001", "S603", "S607", "T201"]
 
 [tool.ruff.lint.isort]
 force-sort-within-sections = true

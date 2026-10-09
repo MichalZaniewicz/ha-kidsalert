@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KidsAlert cards – dev preview</title>
+<!--
+  Preview of the bundled cards against a mock `hass`, with made-up demo alerts and our own
+  illustrations (no KidsAlert content). Serve the repository root over HTTP and open /dev/:
+
+    python -m http.server 8765    →    http://127.0.0.1:8765/dev/
+
+  Query parameters:
+    theme=light|dark (default dark)   lang=en|pl (default en)
+    open=latest|list:<n>              opens the details dialog from a card
+    thumb=<n>                         clicks the dialog thumbnail n times (reveal, then enlarge)
+    error=1 / empty=1                 the error and empty states
+-->
+<style>
+  :root {
+    --primary-color: #03a9f4; --primary-text-color: #e1e1e1; --secondary-text-color: #9b9b9b;
+    --card-background-color: #1c1c1c; --ha-card-background: #1c1c1c; --secondary-background-color: #282828;
+    --error-color: #db4437; --warning-color: #ff9800; --divider-color: rgba(225,225,225,.12);
+    --page-background: #111111;
+  }
+  :root.light {
+    --primary-text-color: #212121; --secondary-text-color: #727272; --card-background-color: #fff;
+    --ha-card-background: #fff; --secondary-background-color: #e5e5e5; --divider-color: rgba(0,0,0,.12);
+    --page-background: #fafafa;
+  }
+  body { margin: 0; padding: 24px; background: var(--page-background); font-family: Roboto, "Segoe UI", sans-serif; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 440px)); gap: 16px; align-items: start; }
+  ha-card { display: block; border-radius: 12px; background: var(--ha-card-background); color: var(--primary-text-color);
+    border: 1px solid var(--divider-color); }
+</style>
+</head>
+<body>
+<div class="grid">
+  <kidsalert-card id="latest"></kidsalert-card>
+  <kidsalert-list-card id="list"></kidsalert-list-card>
+</div>
+<script>
+  const params = new URLSearchParams(location.search);
+  if (params.get("theme") === "light") document.documentElement.classList.add("light");
+  const lang = params.get("lang") === "pl" ? "pl" : "en";
+  document.documentElement.lang = lang;
+  customElements.define("ha-card", class extends HTMLElement {});
+
+  const ago = (hours) => new Date(Date.now() - hours * 3600e3).toISOString();
+  const art = (name) => new URL(`demo/${name}.svg`, location.href).href;
+
+  // [id, image, danger, sensitive, hours ago, English title, Polish title]
+  const DEMO = [
+    [207, "parcel-texts", true, false, 2, "Fake parcel texts target parents", "Fałszywe SMS-y o paczkach celują w rodziców"],
+    [206, "screen-time-report", false, false, 74, "Report: how families handle screen time", "Raport: jak rodziny radzą sobie z czasem ekranowym"],
+    [205, "railway-crossing", false, true, 220, "Selfie trend on railway crossings", "Trend selfie na przejazdach kolejowych"],
+    [204, "scooter-stunts", false, false, 500, "Dangerous scooter stunts on video", "Niebezpieczne popisy na hulajnogach"],
+    [203, "chain-messages", false, false, 850, "Chain messages scaring younger kids", "Łańcuszki straszące młodsze dzieci"],
+    [202, "game-chat", true, false, 1400, "Game chats used to lure children", "Czaty w grach używane do wabienia dzieci"],
+    [201, "water-safety", false, false, 2300, "Summer holidays: water safety", "Wakacje: bezpieczeństwo nad wodą"],
+  ];
+
+  const CONTENT = {
+    207: {
+      en: `<p><strong>A new wave of fake delivery texts is reaching parents' phones.</strong></p>
+        <p>The message says a parcel is waiting and asks for a small payment through a link. The page looks like a real courier and asks for card details.</p>
+        <ul><li>Don't open links in unexpected delivery texts.</li><li>Check the parcel in the courier's own app.</li><li>Talk to your children: the same texts reach their phones.</li></ul>
+        <p>If you have already paid, call your bank and block the card. More advice: https://example.org/safety</p>`,
+      pl: `<p><strong>Do telefonów rodziców trafia nowa fala fałszywych SMS-ów o przesyłkach.</strong></p>
+        <p>Wiadomość informuje o czekającej paczce i prosi o niewielką dopłatę przez link. Strona wygląda jak serwis kuriera i prosi o dane karty.</p>
+        <ul><li>Nie otwieraj linków z nieoczekiwanych SMS-ów o paczkach.</li><li>Sprawdzaj przesyłki w aplikacji kuriera.</li><li>Porozmawiaj z dziećmi: te same SMS-y trafiają na ich telefony.</li></ul>
+        <p>Jeśli już zapłaciłeś, zadzwoń do banku i zablokuj kartę. Więcej porad: https://example.org/safety</p>`,
+    },
+    205: {
+      en: `<p>Short videos of teenagers posing on railway crossings are spreading on social media.</p>
+        <p>The clips are filmed seconds before a train passes. Talk about why no video is worth the risk, and check which accounts your child follows.</p>`,
+      pl: `<p>W mediach społecznościowych krążą krótkie filmy nastolatków pozujących na przejazdach kolejowych.</p>
+        <p>Nagrania powstają kilka sekund przed przejazdem pociągu. Porozmawiaj z dzieckiem, dlaczego żaden film nie jest wart ryzyka, i sprawdź, kogo obserwuje.</p>`,
+    },
+  };
+
+  CONTENT[202] = {
+    en: `<p><strong>Strangers are using chats in popular online games to reach children.</strong></p>
+      <p>They start with gifts of in-game currency and quickly ask to move the conversation to a private messenger.</p>
+      <ul><li>Set the game's chat to friends only.</li><li>Agree with your child that gifts from strangers are a warning sign.</li><li>Ask about new "friends" from games without judging.</li></ul>`,
+    pl: `<p><strong>Obcy wykorzystują czaty w popularnych grach, żeby dotrzeć do dzieci.</strong></p>
+      <p>Zaczynają od prezentów w walucie gry i szybko proponują przejście na prywatny komunikator.</p>
+      <ul><li>Ustaw czat w grze tylko dla znajomych.</li><li>Umów się z dzieckiem, że prezenty od obcych to sygnał ostrzegawczy.</li><li>Pytaj o nowych „znajomych” z gier bez oceniania.</li></ul>`,
+  };
+
+  const alerts = DEMO.map(([id, image, danger, sensitive, hours, en, pl]) => ({
+    id, title: lang === "pl" ? pl : en, image: art(image), thumbnail: art(image),
+    is_danger: danger, is_sensitive: sensitive, send_at: ago(hours), sent_at: ago(hours),
+  }));
+
+  const ENTITY = "sensor.kidsalert_en_latest_alert";
+  const hass = {
+    language: lang, locale: { language: lang }, config: { time_zone: Intl.DateTimeFormat().resolvedOptions().timeZone },
+    entities: { [ENTITY]: { entity_id: ENTITY, platform: "kidsalert" } },
+    states: { [ENTITY]: { state: alerts[0].title, attributes: { alert_id: alerts[0].id }, last_updated: new Date().toISOString() } },
+    async callWS(msg) {
+      if (params.has("error")) throw { code: "unavailable" };
+      if (msg.type === "kidsalert/alerts") return { alerts: params.has("empty") ? [] : alerts, language: lang, danger_hours: 24 };
+      if (msg.type === "kidsalert/alert") {
+        const alert = alerts.find((a) => a.id === msg.alert_id);
+        const content = CONTENT[alert.id]?.[lang] ?? `<p>${lang === "pl" ? "Treść demonstracyjna." : "Demo alert text."}</p>`;
+        return { ...alert, content, video: null };
+      }
+      throw { code: "unknown_command" };
+    },
+  };
+
+  const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+  async function boot() {
+    const latest = document.getElementById("latest");
+    latest.setConfig({ type: "custom:kidsalert-card" });
+    latest.hass = hass;
+    const list = document.getElementById("list");
+    list.setConfig({ type: "custom:kidsalert-list-card", count: 6, title: lang === "pl" ? "Ostatnie alerty" : "Recent alerts" });
+    list.hass = hass;
+
+    const open = params.get("open");
+    if (!open) return;
+    await wait(300);
+    const [card, index] = open.split(":");
+    const target = card === "list"
+      ? list.shadowRoot.querySelectorAll("[data-alert]")[Number(index || 0)]
+      : latest.shadowRoot.querySelector("[data-alert]");
+    target.click();
+    for (let i = 0; i < Number(params.get("thumb") || 0); i++) {
+      await wait(400);
+      document.querySelector("kidsalert-dialog").shadowRoot.querySelector(".thumb").click();
+    }
+  }
+
+  Promise.all(["kidsalert-card", "kidsalert-list-card"].map((name) => customElements.whenDefined(name))).then(boot);
+</script>
+<script type="module" src="../custom_components/kidsalert/frontend/kidsalert-card.js"></script>
+</body>
+</html>
