@@ -24,6 +24,7 @@ from .const import (
     VERSION,
 )
 from .coordinator import KidsAlertCoordinator, event_payload
+from .loader import async_register_loader, async_remove_loader
 from .websocket import async_register_websocket_commands
 
 PLATFORMS = [Platform.SENSOR, Platform.BINARY_SENSOR, Platform.EVENT]
@@ -39,7 +40,9 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
         [StaticPathConfig(STATIC_URL, str(Path(__file__).parent / "frontend"), True)]
     )
     # The version query busts browser caches whenever the integration is updated.
-    add_extra_js_url(hass, f"{STATIC_URL}/{CARD_FILENAME}?v={VERSION}")
+    card_url = f"{STATIC_URL}/{CARD_FILENAME}?v={VERSION}"
+    add_extra_js_url(hass, card_url)
+    await async_register_loader(hass, card_url)
     async_register_websocket_commands(hass)
     return True
 
@@ -74,6 +77,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: KidsAlertConfigEntry) ->
 
 async def async_unload_entry(hass: HomeAssistant, entry: KidsAlertConfigEntry) -> bool:
     return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+
+
+async def async_remove_entry(hass: HomeAssistant, entry: KidsAlertConfigEntry) -> None:
+    """Drop the dashboard loader together with the last KidsAlert entry."""
+    if not any(
+        other.entry_id != entry.entry_id for other in hass.config_entries.async_entries(DOMAIN)
+    ):
+        await async_remove_loader(hass)
 
 
 async def _async_reload_entry(hass: HomeAssistant, entry: KidsAlertConfigEntry) -> None:

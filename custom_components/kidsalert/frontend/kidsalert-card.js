@@ -1,6 +1,6 @@
 /* KidsAlert dashboard cards, served and registered by the kidsalert integration. */
 
-const VERSION = "0.1.3";
+const VERSION = "0.1.4";
 const DOMAIN = "kidsalert";
 
 const STRINGS = {

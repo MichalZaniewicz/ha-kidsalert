@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Final
 
 DOMAIN: Final = "kidsalert"
-VERSION: Final = "0.1.3"
+VERSION: Final = "0.1.4"
 
 API_BASE_URL: Final = "https://kidsalert.pl"
 

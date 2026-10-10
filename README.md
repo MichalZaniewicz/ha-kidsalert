@@ -1,7 +1,7 @@
 # KidsAlert (unofficial) for Home Assistant
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/MichalZaniewicz/ha-kidsalert/main/docs/hero-banner.svg?v=0.1.3" alt="KidsAlert for Home Assistant">
+  <img src="https://raw.githubusercontent.com/MichalZaniewicz/ha-kidsalert/main/docs/hero-banner.svg?v=0.1.4" alt="KidsAlert for Home Assistant">
 </p>
 
 <p align="center">
@@ -33,7 +33,7 @@ into <ha-alert> and drops every child whose textContent is empty, which silently
 
 ## What it does
 
-![KidsAlert for Home Assistant: the cards, the alert dialog, sensitive content and Polish](https://raw.githubusercontent.com/MichalZaniewicz/ha-kidsalert/main/docs/trailer.webp?v=0.1.3)
+![KidsAlert for Home Assistant: the cards, the alert dialog, sensitive content and Polish](https://raw.githubusercontent.com/MichalZaniewicz/ha-kidsalert/main/docs/trailer.webp?v=0.1.4)
 
 - 🚨 **Know the moment an alert goes out.** Every new alert fires an event with its title, its full text and the image, once. Alerts published while Home Assistant was off are announced when it's back.
 - 📱 **A notification on your phone in one click.** Ready-made blueprints for the Companion app and for Pushbullet send the image and the alert text, in full on Pushbullet, and can be limited to danger alerts.
@@ -45,7 +45,7 @@ into <ha-alert> and drops every child whose textContent is empty, which silently
 - 🪶 **Light on a non-profit service.** One small request every 10 minutes by default, the full text only for new alerts, no account and no personal data.
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/MichalZaniewicz/ha-kidsalert/main/docs/notifications-banner.svg?v=0.1.3" alt="Notifications">
+  <img src="https://raw.githubusercontent.com/MichalZaniewicz/ha-kidsalert/main/docs/notifications-banner.svg?v=0.1.4" alt="Notifications">
 </p>
 
 ## Notifications
@@ -60,23 +60,23 @@ Two ready-made blueprints: import one, pick where the alerts go, and decide whet
 Prefer your own automation? Trigger on the **New alert** event entity or the `kidsalert_new_alert` event. **[Examples and every field](https://github.com/MichalZaniewicz/ha-kidsalert/wiki/Notifications)**
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/MichalZaniewicz/ha-kidsalert/main/docs/cards-banner.svg?v=0.1.3" alt="Dashboard cards">
+  <img src="https://raw.githubusercontent.com/MichalZaniewicz/ha-kidsalert/main/docs/cards-banner.svg?v=0.1.4" alt="Dashboard cards">
 </p>
 
 ## Dashboard cards
 
 The cards install and register with the integration. Open a dashboard, **Add card**, search for **KidsAlert**, and they find your alerts on their own. They follow your light or dark theme and your Home Assistant language.
 
-![Latest alert and recent alerts cards](https://raw.githubusercontent.com/MichalZaniewicz/ha-kidsalert/main/docs/images/cards.png?v=0.1.3)
+![Latest alert and recent alerts cards](https://raw.githubusercontent.com/MichalZaniewicz/ha-kidsalert/main/docs/images/cards.png?v=0.1.4)
 
 Tap any alert to read it in full:
 
-![Alert details dialog](https://raw.githubusercontent.com/MichalZaniewicz/ha-kidsalert/main/docs/images/dialog.png?v=0.1.3)
+![Alert details dialog](https://raw.githubusercontent.com/MichalZaniewicz/ha-kidsalert/main/docs/images/dialog.png?v=0.1.4)
 
 <sub>Screenshots show made-up demo alerts.</sub> **[Card options](https://github.com/MichalZaniewicz/ha-kidsalert/wiki/Cards)**
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/MichalZaniewicz/ha-kidsalert/main/docs/installation-banner.svg?v=0.1.3" alt="Installation">
+  <img src="https://raw.githubusercontent.com/MichalZaniewicz/ha-kidsalert/main/docs/installation-banner.svg?v=0.1.4" alt="Installation">
 </p>
 
 ## Get started

@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 from datetime import timedelta
+import json
 from typing import Any
 from unittest.mock import AsyncMock
+from urllib.parse import quote
 
 from freezegun.api import FrozenDateTimeFactory
 import pytest
@@ -15,8 +17,10 @@ from pytest_homeassistant_custom_component.common import (
 )
 
 from custom_components.kidsalert.api import KidsAlertApiError
-from custom_components.kidsalert.const import EVENT_NEW_ALERT, STATIC_URL
+from custom_components.kidsalert.const import EVENT_NEW_ALERT, STATIC_URL, VERSION
+from custom_components.kidsalert.loader import LOADER_PREFIX, loader_url
 from homeassistant.components.frontend import DATA_EXTRA_MODULE_URL
+from homeassistant.components.lovelace.const import LOVELACE_DATA
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.const import STATE_UNAVAILABLE, STATE_UNKNOWN
 from homeassistant.core import HomeAssistant
@@ -24,6 +28,7 @@ from homeassistant.core import HomeAssistant
 from .conftest import NOW
 
 SENSOR = "sensor.kidsalert_pl_latest_alert"
+CARD_URL = f"{STATIC_URL}/kidsalert-card.js?v={VERSION}"
 EVENT = "event.kidsalert_pl_new_alert"
 
 
@@ -203,3 +208,62 @@ async def test_card_is_served_and_registered(
     resp = await client.get(f"{STATIC_URL}/kidsalert-card.js")
     assert resp.status == 200
     assert 'define("kidsalert-card"' in await resp.text()
+
+
+def loader_resources(hass: HomeAssistant) -> list[dict[str, Any]]:
+    resources = hass.data[LOVELACE_DATA].resources.async_items()
+    return [item for item in resources if item["url"].startswith(LOADER_PREFIX)]
+
+
+async def test_loader_resource_is_added(
+    hass: HomeAssistant, config_entry: MockConfigEntry, mock_api: AsyncMock
+) -> None:
+    await setup_entry(hass, config_entry)
+
+    [loader] = loader_resources(hass)
+    assert loader["type"] == "module"
+    assert loader["url"] == loader_url(CARD_URL)
+    # The loader's first attempt must use the exact extra module URL.
+    assert CARD_URL in hass.data[DATA_EXTRA_MODULE_URL].urls
+    assert quote(json.dumps(CARD_URL), safe="") in loader["url"]
+
+
+async def test_outdated_and_duplicate_loaders_are_replaced(
+    hass: HomeAssistant,
+    config_entry: MockConfigEntry,
+    mock_api: AsyncMock,
+    hass_storage: dict[str, Any],
+) -> None:
+    old = loader_url(f"{STATIC_URL}/kidsalert-card.js?v=0.0.1")
+    hass_storage["lovelace_resources"] = {
+        "version": 1,
+        "minor_version": 1,
+        "key": "lovelace_resources",
+        "data": {
+            "items": [
+                {"id": "other", "type": "module", "url": "/local/other-card.js"},
+                {"id": "old", "type": "module", "url": old},
+                {"id": "copy", "type": "module", "url": old},
+            ]
+        },
+    }
+    await setup_entry(hass, config_entry)
+
+    assert loader_resources(hass) == [{"id": "old", "type": "module", "url": loader_url(CARD_URL)}]
+    urls = [item["url"] for item in hass.data[LOVELACE_DATA].resources.async_items()]
+    assert "/local/other-card.js" in urls
+
+
+async def test_loader_resource_is_removed_with_the_last_entry(
+    hass: HomeAssistant, config_entry: MockConfigEntry, mock_api: AsyncMock
+) -> None:
+    await setup_entry(hass, config_entry)
+    second = MockConfigEntry(domain=config_entry.domain, data=config_entry.data)
+    second.add_to_hass(hass)
+
+    await hass.config_entries.async_remove(second.entry_id)
+    assert len(loader_resources(hass)) == 1
+
+    await hass.config_entries.async_remove(config_entry.entry_id)
+    await hass.async_block_till_done()
+    assert loader_resources(hass) == []

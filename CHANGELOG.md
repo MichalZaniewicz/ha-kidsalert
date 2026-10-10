@@ -6,6 +6,12 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.4] - 2026-10-10
+
+### Fixed
+
+- Cards no longer show "Configuration error" on a dashboard opened while Home Assistant restarts, for example in the Companion app. The integration keeps a small loader among the dashboard resources (Settings → Dashboards → Resources) that loads the cards as soon as Home Assistant has started. It is removed together with the integration. Dashboards with resources managed in YAML still need a page reload after a restart.
+
 ## [0.1.3] - 2026-10-10
 
 ### Added
@@ -51,6 +57,7 @@ Release withdrawn: it shipped an icon based on the KidsAlert logo. Its changes a
 - Notification blueprint.
 - Diagnostics and brand icons.
 
-[Unreleased]: https://github.com/MichalZaniewicz/ha-kidsalert/compare/v0.1.3...HEAD
+[Unreleased]: https://github.com/MichalZaniewicz/ha-kidsalert/compare/v0.1.4...HEAD
+[0.1.4]: https://github.com/MichalZaniewicz/ha-kidsalert/compare/v0.1.3...v0.1.4
 [0.1.3]: https://github.com/MichalZaniewicz/ha-kidsalert/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/MichalZaniewicz/ha-kidsalert/releases/tag/v0.1.2
